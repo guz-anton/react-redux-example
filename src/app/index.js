@@ -1,41 +1,23 @@
 // @flow weak
 
-import React                from 'react';
-import {render}             from 'react-dom';
-import injectTpEventPlugin  from 'react-tap-event-plugin';
-import { AppContainer }     from 'react-hot-loader';
-import Root                 from './Root';
+import React from 'react'
+import { render } from 'react-dom'
+import { createStore, applyMiddleware } from 'redux'
+import { Provider } from 'react-redux'
+import App from './containers/App'
+import quotesApp from './reducers'
+import thunkMiddleware from 'redux-thunk'
+import api from './middleware/api'
 
-import 'babel-polyfill';
-import 'animate.css';
-import 'jquery';
-import 'font-awesome/css/font-awesome.min.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.min.js';
-import './style/index.scss';
+let createStoreWithMiddleware = applyMiddleware(thunkMiddleware, api)(createStore)
 
-const ELEMENT_TO_BOOTSTRAP  = 'root';
-const BootstrapedElement    = document.getElementById(ELEMENT_TO_BOOTSTRAP);
+let store = createStoreWithMiddleware(quotesApp)
 
-injectTpEventPlugin();
+let rootElement = document.getElementById('root')
 
-const renderApp = RootComponent => {
-  render(
-    <AppContainer>
-      <RootComponent />
-    </AppContainer>,
-    BootstrapedElement
-  );
-};
-
-renderApp(Root);
-
-if (module.hot) {
-  module.hot.accept(
-    './Root',
-    () => {
-      const RootComponent = require('./Root').default;
-      renderApp(RootComponent);
-    }
-  );
-}
+render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    rootElement
+)

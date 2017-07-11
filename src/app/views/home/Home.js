@@ -4,8 +4,6 @@ import React, {
   PureComponent
 }                     from 'react';
 import PropTypes      from 'prop-types';
-import {Jumbotron}    from '../../components';
-import AnimatedView   from '../../components/animatedView/AnimatedView';
 import { Link }       from 'react-router-dom';
 
 class Home extends PureComponent {
@@ -27,8 +25,7 @@ class Home extends PureComponent {
 
   render() {
     return(
-      <AnimatedView>
-        <Jumbotron>
+        <div>
           <h1>
             ReactJS + Bootstrap
           </h1>
@@ -53,9 +50,8 @@ class Home extends PureComponent {
               go to about
             </Link>
           </p>
-        </Jumbotron>
-      </AnimatedView>
-    );
+        </div>
+      );
   }
 }
 
