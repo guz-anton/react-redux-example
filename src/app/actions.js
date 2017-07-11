@@ -5,6 +5,8 @@ import { CALL_API } from './middleware/api'
 export const LOGIN_REQUEST = 'LOGIN_REQUEST'
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
 export const LOGIN_FAILURE = 'LOGIN_FAILURE'
+export const LOGOUT_REQUEST = 'LOGOUT_REQUEST'
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS'
 export const QUOTE_REQUEST = 'QUOTE_REQUEST'
 export const QUOTE_SUCCESS = 'QUOTE_SUCCESS'
 export const QUOTE_FAILURE = 'QUOTE_FAILURE'
@@ -51,6 +53,22 @@ function receiveLogin(user) {
     }
 }
 
+function requestLogout() {
+    return {
+        type: LOGOUT_REQUEST,
+        isFetching: true,
+        isAuthenticated: false
+    }
+}
+
+function receiveLogout() {
+    return {
+        type: LOGOUT_SUCCESS,
+        isFetching: false,
+        isAuthenticated: false
+    }
+}
+
 function loginError(message) {
     return {
         type: LOGIN_FAILURE,
@@ -73,23 +91,22 @@ export function loginUser(creds) {
     return dispatch => {
         // We dispatch requestLogin to kickoff the call to the API
         dispatch(requestLogin(creds))
-        //debugger;
 
         return fetch('/sessions/create', config)
             .then(response =>
                 response.json().then(user => ({ user, response }))
             ).then(({ user, response }) =>  {
-                if (!response.ok) {
+                if (response.ok) {
+                    // If login was successful, set the token in local storage
+                    localStorage.setItem('id_token', user.id_token)
+                    localStorage.setItem('access_token', user.access_token)
+                    // Dispatch the success action
+                    dispatch(receiveLogin(user))
+                } else {
                     // If there was a problem, we want to
                     // dispatch the error condition
                     dispatch(loginError(user.message))
                     return Promise.reject(user)
-                } else {
-                    // If login was successful, set the token in local storage
-                    localStorage.setItem('id_token', user.id_token)
-                    localStorage.setItem('id_token', user.access_token)
-                    // Dispatch the success action
-                    dispatch(receiveLogin(user))
                 }
             }).catch(err => console.log("Error: ", err))
     }
